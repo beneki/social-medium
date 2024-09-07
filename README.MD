@@ -68,9 +68,9 @@ Ensure you have a .env file or environment variables set up for sensitive data l
 
 ## Usage
 
-**Sign Up**: Create a new account with a username, email, and password.
-**Log In**: Access your account with your username and password.
-**Profile Settings**: Update your profile with a bio, profile image, and location.
+- **Sign Up**: Create a new account with a username, email, and password.
+- **Log In**: Access your account with your username and password.
+- **Profile Settings**: Update your profile with a bio, profile image, and location.
 
 ## Contributing
 
