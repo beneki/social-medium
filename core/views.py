@@ -45,6 +45,21 @@ def like_post(request):
         post.no_of_likes -= 1 
         post.save()
     return redirect('/')
+
+
+@login_required(login_url='signin')
+def profile(request, username):
+    user_object = User.objects.get(username=username)
+    user_profile = Profile.objects.get(user=user_object)
+    user_posts = Post.objects.filter(user=username)
+
+    context = {
+        'user_object': user_object,
+        'user_profile': user_profile,
+        'user_posts': user_posts,
+        'user_post_count': len(user_posts)
+    }
+    return render(request, 'profile.html', context)
     
 
 @login_required(login_url='signin')
