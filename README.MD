@@ -58,7 +58,7 @@ Work on additional features like posts, comments, and more advanced functionalit
 5. **Run the Development Server**
 
     ```bash
-    python manage.py runserver
+    .venv\Scripts\python.exe manage.py runserver 
     ```
 
 ## Configuration

@@ -24,7 +24,7 @@ class Post(models.Model):
     created_at = models.DateTimeField(default=datetime.now)
     no_of_likes = models.IntegerField(default=0)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.user
     
 
@@ -34,3 +34,10 @@ class LikePost(models.Model):
 
     def __str__(self):
         return self.username
+    
+class FollowersCount(models.Model):
+    follower = models.CharField(max_length=100)
+    user = models.CharField(max_length=100)
+
+    def __str__(self) -> str:
+        return super().__str__()

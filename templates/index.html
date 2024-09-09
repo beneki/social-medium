@@ -234,7 +234,8 @@
                                         class="bg-gray-200 border border-white rounded-full w-8 h-8">
                                 </div>
                             </a> -->
-                            <a href="#"><span class="block capitalize font-semibold "> {{post.user}} </span></a>
+                            <a href="/profile/{{post.user}}"><span class="block capitalize font-semibold ">
+                                    {{post.user}} </span></a>
                         </div>
                         <div>
                             <a href="#"> <i
@@ -316,7 +317,8 @@
                                 </div>
 
                             </a>
-                            <a href="#" class="flex items-center space-x-2 flex-1 justify-end">
+                            <a href="{{post.img.url}}" class="flex items-center space-x-2 flex-1 justify-end"
+                                download="">
                                 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
                                     aria-hidden="true" role="img" width="25" height="25"
                                     preserveAspectRatio="xMidYMid meet" viewBox="0 0 16 16">
@@ -352,7 +354,7 @@
                             </div>
                         </div>
                         <p>
-                            <b> {{post.user}} captioned: </b> {{post.caption}}
+                            <a href="/profile/{{post.user}}"></a><b> {{post.user}} captioned: </b> {{post.caption}}
                         </p>
 
                         <div class="border-t pt-4 space-y-4 ">

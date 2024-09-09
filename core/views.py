@@ -3,14 +3,16 @@ from django.contrib.auth.models import User, auth
 from django.contrib import messages
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
-from .models import Profile, Post, LikePost
+from .models import Profile, Post, LikePost, FollowersCount
+
 
 @login_required(login_url='signin')
 def index(request):
     user_object = User.objects.get(username=request.user.username)
     user_profile = Profile.objects.get(user=user_object)
 
-    posts =  Post.objects.all()
+    usernames = FollowersCount.objects.filter(follower=request.user.username).values_list('user', flat=True)
+    posts = list(Post.objects.filter(user__in=usernames))
 
     return render(request, 'index.html', {'user_profile': user_profile, 'posts': posts})
 
@@ -27,6 +29,24 @@ def upload(request):
         return redirect('/')
     else:
         return redirect('/')
+
+
+@login_required(login_url='signin')
+def follow(request):
+    if request.method == 'POST':
+        follower = request.POST['follower']
+        user = request.POST['user']
+
+        if delete_follower := FollowersCount.objects.filter(follower=follower, user=user).first():
+            delete_follower.delete()
+            return redirect('/profile/' + user)
+        else:
+            new_follower = FollowersCount.objects.create(follower=follower, user=user)
+            new_follower.save()
+            return redirect('/profile/' + user)
+    else:
+        return redirect('/')
+
 
 @login_required(login_url='signin')
 def like_post(request):
@@ -53,11 +73,25 @@ def profile(request, username):
     user_profile = Profile.objects.get(user=user_object)
     user_posts = Post.objects.filter(user=username)
 
+    follower = request.user.username
+    user = username
+
+    if FollowersCount.objects.filter(follower=follower, user=user).first():
+        btn_txt = 'unfollow' 
+    else:
+        btn_txt = 'Follow' 
+
+    user_followers = len(FollowersCount.objects.filter(user=username)) 
+    user_followings = len(FollowersCount.objects.filter(follower=username))
+
     context = {
         'user_object': user_object,
         'user_profile': user_profile,
         'user_posts': user_posts,
-        'user_post_count': len(user_posts)
+        'user_post_count': len(user_posts),
+        'btn_txt': btn_txt,
+        'user_followers': user_followers,
+        'user_followings': user_followings,
     }
     return render(request, 'profile.html', context)
     
