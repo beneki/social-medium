@@ -4,17 +4,41 @@ from django.contrib import messages
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from .models import Profile, Post, LikePost, FollowersCount
-
+import random
 
 @login_required(login_url='signin')
 def index(request):
-    user_object = User.objects.get(username=request.user.username)
-    user_profile = Profile.objects.get(user=user_object)
+    # Get the current user's profile
+    current_user_profile = Profile.objects.get(user=request.user)
 
-    usernames = FollowersCount.objects.filter(follower=request.user.username).values_list('user', flat=True)
-    posts = list(Post.objects.filter(user__in=usernames))
+    # Get the usernames that the current user is following
+    followed_usernames = FollowersCount.objects.filter(follower=request.user.username).values_list('user', flat=True)
 
-    return render(request, 'index.html', {'user_profile': user_profile, 'posts': posts})
+    # Fetch posts from the users the current user is following
+    followed_users_posts = Post.objects.filter(user__in=followed_usernames)
+
+    # Fetch all users except the current user
+    all_users_except_current = User.objects.exclude(username=request.user.username)
+    
+    # Fetch the users the current user is following
+    followed_users = User.objects.filter(username__in=followed_usernames)
+
+    # Get new suggestions by excluding the users the current user is already following
+    suggested_users = all_users_except_current.exclude(id__in=followed_users.values_list('id', flat=True))
+    
+    # Shuffle the suggested users for randomness
+    shuffled_suggestions = list(suggested_users)
+    random.shuffle(shuffled_suggestions)
+
+    # Get profiles for the suggested users
+    suggested_user_profiles = Profile.objects.filter(user__in=shuffled_suggestions)
+
+    # Render the result, limiting the suggestions to the top 4
+    return render(request, 'index.html', {
+        'user_profile': current_user_profile,
+        'posts': followed_users_posts,
+        'suggested_user_profiles': suggested_user_profiles[:4]
+    })
 
 
 def upload(request):
@@ -29,6 +53,20 @@ def upload(request):
         return redirect('/')
     else:
         return redirect('/')
+
+
+@login_required(login_url='signin')    
+def search(request):
+    user_object = User.objects.get(username=request.user.username)
+    user_profile = Profile.objects.get(user=user_object)
+
+
+    if request.method == 'POST':
+        username = request.POST['username']
+        user_ids = User.objects.filter(username__icontains=username).values_list('id', flat=True)
+        profile_list = Profile.objects.filter(id_user__in=user_ids)
+
+        return render(request, 'search.html', {'user_profile': user_profile, 'username_profile_list': profile_list})
 
 
 @login_required(login_url='signin')
