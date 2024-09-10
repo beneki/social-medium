@@ -11,13 +11,8 @@ def index(request):
     # Get the current user's profile
     current_user_profile = Profile.objects.get(user=request.user)
 
-    # Get the usernames that the current user is following
     followed_usernames = FollowersCount.objects.filter(follower=request.user.username).values_list('user', flat=True)
-
-    # Fetch posts from the users the current user is following
     followed_users_posts = Post.objects.filter(user__in=followed_usernames)
-
-    # Fetch all users except the current user
     all_users_except_current = User.objects.exclude(username=request.user.username)
     
     # Fetch the users the current user is following
@@ -30,10 +25,8 @@ def index(request):
     shuffled_suggestions = list(suggested_users)
     random.shuffle(shuffled_suggestions)
 
-    # Get profiles for the suggested users
     suggested_user_profiles = Profile.objects.filter(user__in=shuffled_suggestions)
 
-    # Render the result, limiting the suggestions to the top 4
     return render(request, 'index.html', {
         'user_profile': current_user_profile,
         'posts': followed_users_posts,
